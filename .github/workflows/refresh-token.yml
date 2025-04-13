@@ -2,7 +2,7 @@ name: Refresh Access Token
 
 on:
   schedule:
-    - cron: "0 2 * * *"   # 9:00 sáng Việt Nam
+    - cron: "0 2 * * *"   # 9:00 sáng Việt Nam (cron này theo giờ UTC)
   workflow_dispatch:
 
 permissions:
@@ -40,10 +40,10 @@ jobs:
       - name: Commit Access_Token.xlsx
         run: |
           git add Access_Token.xlsx
-          git commit -m "🔁 Update Access Token" || echo "No changes"
+          git commit -m "🔁 Update Access Token" || echo "No changes to commit"
 
       - name: Push to GitHub
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main || echo "Push skipped"
+          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main || echo "Push failed"
