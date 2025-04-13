@@ -2,27 +2,29 @@ name: Refresh Access Token
 
 on:
   schedule:
-    - cron: "0 2 * * *"     # 9:00 sáng Việt Nam (2:00 UTC)
-  workflow_dispatch:        # Cho phép bấm nút run thủ công
+    - cron: "0 2 * * *"   # 9:00 sáng Việt Nam
+  workflow_dispatch:
 
 permissions:
-  contents: write           # Cho phép ghi file vào repo
+  contents: write  # ⚠️ Quan trọng để push được
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # ⚠️ Cần thiết để pull được đầy đủ lịch sử
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
-        run: pip install openpyxl requests
+      - name: Install Python packages
+        run: pip install requests openpyxl
 
       - name: Run refresh_token.py
         run: python refresh_token.py
@@ -32,13 +34,16 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Pull latest changes
+      - name: Pull latest changes to avoid conflict
         run: git pull --rebase origin main || true
 
-      - name: Add & commit updated file
+      - name: Commit Access_Token.xlsx
         run: |
           git add Access_Token.xlsx
-          git commit -m "🔁 Update Access Token" || echo "No changes to commit"
+          git commit -m "🔁 Update Access Token" || echo "No changes"
 
       - name: Push to GitHub
-        run: git push origin main || echo "Nothing to push"
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main || echo "Push skipped"
