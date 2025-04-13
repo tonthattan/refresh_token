@@ -2,11 +2,11 @@ name: Refresh Access Token
 
 on:
   schedule:
-    - cron: "0 2 * * *"   # 9:00 sáng Việt Nam (cron này theo giờ UTC)
+    - cron: "0 2 * * *"  # 9:00 sáng Việt Nam (theo giờ UTC)
   workflow_dispatch:
 
 permissions:
-  contents: write  # ⚠️ Quan trọng để push được
+  contents: write  # Đảm bảo quyền ghi để push file
 
 jobs:
   refresh:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # ⚠️ Cần thiết để pull được đầy đủ lịch sử
+          fetch-depth: 0  # Cần để đồng bộ với lịch sử commit đầy đủ
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,7 +35,7 @@ jobs:
           git config user.email "actions@github.com"
 
       - name: Pull latest changes to avoid conflict
-        run: git pull --rebase origin main || true
+        run: git pull --rebase origin main || true  # Đảm bảo repo được đồng bộ trước khi push
 
       - name: Commit Access_Token.xlsx
         run: |
