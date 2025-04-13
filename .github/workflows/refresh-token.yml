@@ -2,14 +2,14 @@ name: Refresh Access Token
 
 on:
   schedule:
-    - cron: "0 2 * * *"   # 2:00 AM UTC = 9:00 AM Việt Nam
-  workflow_dispatch:      # Cho phép chạy tay từ GitHub UI
+    - cron: "0 2 * * *"     # 9:00 sáng Việt Nam (2:00 UTC)
+  workflow_dispatch:        # Cho phép bấm nút run thủ công
 
 permissions:
-  contents: write         # Cho phép ghi file vào repo
+  contents: write           # Cho phép ghi file vào repo
 
 jobs:
-  refresh-token:
+  refresh:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'  # Hoặc 3.9 nếu dùng openpyxl ổn định hơn
+          python-version: '3.10'
 
       - name: Install dependencies
         run: pip install openpyxl requests
@@ -32,14 +32,13 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Pull latest changes before committing
-        run: git pull --rebase origin main
+      - name: Pull latest changes
+        run: git pull --rebase origin main || true
 
-      - name: Commit updated Excel file
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: "Update Access Token file"
-          add: "Access_Token.xlsx"
+      - name: Add & commit updated file
+        run: |
+          git add Access_Token.xlsx
+          git commit -m "🔁 Update Access Token" || echo "No changes to commit"
 
-      - name: Push changes to GitHub
-        run: git push origin main
+      - name: Push to GitHub
+        run: git push origin main || echo "Nothing to push"
