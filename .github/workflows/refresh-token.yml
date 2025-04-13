@@ -1,49 +1,41 @@
-name: Refresh Access Token
+name: Refresh Token and Commit to Repo
 
 on:
   schedule:
-    - cron: "0 2 * * *"  # 9:00 sáng Việt Nam (theo giờ UTC)
-  workflow_dispatch:
-
-permissions:
-  contents: write  # Đảm bảo quyền ghi để push file
+    - cron: '0 9 * * *'  # Chạy vào lúc 9:00 AM hàng ngày
+  workflow_dispatch: # Cho phép chạy thủ công
 
 jobs:
-  refresh:
+  refresh_token:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Cần để đồng bộ với lịch sử commit đầy đủ
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
 
-      - name: Install Python packages
-        run: pip install requests openpyxl
+    - name: Install dependencies
+      run: |
+        pip install openpyxl requests
 
-      - name: Run refresh_token.py
-        run: python refresh_token.py
+    - name: Pull latest changes to avoid conflict
+      run: |
+        git fetch origin main
+        git merge origin/main --no-edit  # Merge các thay đổi từ remote vào local branch
 
-      - name: Configure Git
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+    - name: Run the refresh_token script
+      run: |
+        python refresh_token.py
 
-      - name: Pull latest changes to avoid conflict
-        run: git pull origin main --rebase  # Đảm bảo repo được đồng bộ trước khi push
+    - name: Commit changes to GitHub
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add Access_Token.xlsx
+        git commit -m "Update Access Token file"
+        git push origin main
 
-      - name: Commit Access_Token.xlsx
-        run: |
-          git add Access_Token.xlsx
-          git commit -m "🔁 Update Access Token" || echo "No changes to commit"
-
-      - name: Push to GitHub
-        env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main || echo "Push failed"
