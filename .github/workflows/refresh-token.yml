@@ -2,8 +2,8 @@ name: Refresh Token Daily
 
 on:
   schedule:
-    - cron: "50 14 * * *"  # 21:45 VN mỗi ngày (14:45 UTC)
-  workflow_dispatch:
+    - cron: "54 14 * * *"  # 21:45 VN mỗi ngày (14:45 UTC)
+  workflow_dispatch:  # Cho phép chạy thủ công
 
 jobs:
   run-script:
@@ -14,11 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Bước 2: Cài đặt Python
+      # Bước 2: Cài đặt Python (chỉnh lại phiên bản ở đây)
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: 3.10  # Phiên bản Python hợp lệ (thay 3.1 bằng 3.10)
 
       # Bước 3: Cài đặt dependencies (requests, openpyxl)
       - name: Install dependencies
@@ -30,11 +30,11 @@ jobs:
         run: |
           python refresh_token.py
 
-      # Bước 5: Commit file Excel vào repo
+      # Bước 5: Commit .xlsx file vào GitHub
       - name: Commit .xlsx file to GitHub
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: 'GitHub Actions'
-          author_email: 'actions@github.com'
-          message: 'Update Access Token file'
-          add: '**/*.xlsx'  # Đảm bảo commit file .xlsx mới trong repo
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add Access_Token.xlsx
+          git diff --cached --exit-code || git commit -m "Update Access Token file"
+          git push
