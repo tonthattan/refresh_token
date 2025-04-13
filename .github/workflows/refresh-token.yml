@@ -2,7 +2,7 @@ name: Refresh Token Daily
 
 on:
   schedule:
-    - cron: "56 14 * * *"  # 21:45 VN mỗi ngày (14:45 UTC)
+    - cron: "57 14 * * *"  # 21:45 VN mỗi ngày (14:45 UTC)
   workflow_dispatch:  # Cho phép chạy thủ công
 
 jobs:
@@ -14,9 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Bước 2: Cache Python dependencies
+      # Bước 2: Cache Python dependencies (Cập nhật lên actions/cache@v3)
       - name: Cache Python dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3  # Cập nhật lên v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-python-${{ hashFiles('**/requirements.txt') }}
