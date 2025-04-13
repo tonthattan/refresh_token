@@ -2,7 +2,7 @@ name: Refresh Token Daily
 
 on:
   schedule:
-    - cron: "50 7 * * *"  # chạy lúc 7:50 sáng UTC mỗi ngày
+    - cron: "42 14 * * *"  # chạy lúc 7:50 sáng UTC mỗi ngày
   workflow_dispatch:      # cho phép bấm chạy tay
 
 jobs:
