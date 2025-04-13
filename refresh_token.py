@@ -7,7 +7,7 @@ CLIENT_ID = "d23fee23-b5c3-4056-90f3-02244f6f2ab5"
 CLIENT_SECRET = "0J38Q~UxwmABLDqsCmurrwCizk2gA7pFW-At7aOe"
 TOKEN_URL = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
 SCOPE = "Files.Read.All Sites.Read.All User.Read offline_access"
-EXCEL_PATH = "E:/Code/Dowload data form one drive to excel/Access_Token.xlsx"
+EXCEL_PATH = "Access_Token.xlsx"  # Đường dẫn file trong repo
 
 # Load refresh_token từ Excel
 wb = openpyxl.load_workbook(EXCEL_PATH)
