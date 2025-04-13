@@ -1,0 +1,27 @@
+name: Refresh Token Daily
+
+on:
+  schedule:
+    - cron: "50 7 * * *"  # chạy lúc 7:50 sáng UTC mỗi ngày
+  workflow_dispatch:      # cho phép bấm chạy tay
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          pip install requests openpyxl flask
+
+      - name: Run refresh_token.py
+        run: |
+          python refresh_token.py
