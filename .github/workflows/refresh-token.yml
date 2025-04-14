@@ -2,7 +2,7 @@ name: Refresh Token and Commit to Repo
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # Chạy vào lúc 9:00 AM hàng ngày
+    - cron: '0 4 * * *'  # Chạy vào lúc 9:00 AM hàng ngày
   workflow_dispatch: # Cho phép chạy thủ công
 
 jobs:
