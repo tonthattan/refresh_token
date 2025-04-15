@@ -34,14 +34,14 @@ jobs:
       - name: Extract token from Excel and write to .txt
         run: |
           python -c "
-import openpyxl
-wb = openpyxl.load_workbook('Access_Token.xlsx', data_only=True)
-ws = wb.active
-token = ws['A2'].value
-with open('access_token.txt', 'w') as f:
-    f.write(token)
-print('✅ Token ghi vào access_token.txt: ', token)
-"
+                  import openpyxl
+                  wb = openpyxl.load_workbook('Access_Token.xlsx', data_only=True)
+                  ws = wb.active
+                  token = ws['A2'].value
+                  with open('access_token.txt', 'w') as f:
+                      f.write(token)
+                  print('✅ Token ghi vào access_token.txt: ', token)
+                  "
 
       - name: Commit and push changes
         run: |
