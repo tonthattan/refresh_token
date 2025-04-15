@@ -2,40 +2,51 @@ name: Refresh Token and Commit to Repo
 
 on:
   schedule:
-    - cron: '20 4 * * *'  # Chạy vào lúc 9:00 AM hàng ngày
-  workflow_dispatch: # Cho phép chạy thủ công
+    - cron: '0 2 * * *'  # 9:00 AM giờ Việt Nam (UTC+7)
+  workflow_dispatch:
 
 jobs:
   refresh_token:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
 
-    - name: Install dependencies
-      run: |
-        pip install openpyxl requests
+      - name: Install dependencies
+        run: |
+          pip install openpyxl requests
 
-    - name: Pull latest changes to avoid conflict
-      run: |
-        git fetch origin main
-        git merge origin/main --no-edit  # Merge các thay đổi từ remote vào local branch
+      - name: Pull latest changes to avoid conflict
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git pull origin main
 
-    - name: Run the refresh_token script
-      run: |
-        python refresh_token.py
+      - name: Run the refresh_token script
+        run: python refresh_token.py
 
-    - name: Commit changes to GitHub
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-        git add Access_Token.xlsx
-        git commit -m "Update Access Token file"
-        git push origin main
+      - name: Extract token from Excel and write to .txt
+        run: |
+          python -c "
+import openpyxl
+wb = openpyxl.load_workbook('Access_Token.xlsx', data_only=True)
+ws = wb.active
+token = ws['A2'].value
+with open('access_token.txt', 'w') as f:
+    f.write(token)
+print('✅ Token ghi vào access_token.txt: ', token)
+"
+
+      - name: Commit and push changes
+        run: |
+          git add Access_Token.xlsx access_token.txt
+          git commit -m "🔄 Update token at $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin main || echo "⚠️ Không có thay đổi để push"
+
 
