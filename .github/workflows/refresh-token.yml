@@ -2,8 +2,8 @@ name: Refresh Token and Commit to Repo
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # 9:00 AM giờ Việt Nam (UTC+7)
-  workflow_dispatch:
+    - cron: '20 4 * * *'  # 11:20 AM Vietnam Time
+  workflow_dispatch:  # Cho phép chạy thủ công
 
 jobs:
   refresh_token:
@@ -19,34 +19,23 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: |
-          pip install openpyxl requests
+        run: pip install openpyxl
 
       - name: Pull latest changes to avoid conflict
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git pull origin main
+          git fetch origin main
+          git merge origin/main --no-edit
 
       - name: Run the refresh_token script
         run: python refresh_token.py
 
       - name: Extract token from Excel and write to .txt
-        run: |
-          python -c "
-                  import openpyxl
-                  wb = openpyxl.load_workbook('Access_Token.xlsx', data_only=True)
-                  ws = wb.active
-                  token = ws['A2'].value
-                  with open('access_token.txt', 'w') as f:
-                      f.write(token)
-                  print('✅ Token ghi vào access_token.txt: ', token)
-                  "
+        run: python write_token_txt.py
 
-      - name: Commit and push changes
+      - name: Commit Access_Token.xlsx and access_token.txt to repo
         run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
           git add Access_Token.xlsx access_token.txt
-          git commit -m "🔄 Update token at $(date +'%Y-%m-%d %H:%M:%S')"
-          git push origin main || echo "⚠️ Không có thay đổi để push"
-
-
+          git commit -m "Update token files" || echo "No changes to commit"
+          git push origin main
