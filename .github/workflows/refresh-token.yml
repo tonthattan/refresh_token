@@ -1,9 +1,6 @@
 name: Refresh Token and Commit to Repo
 
-on:
-  schedule:
-    - cron: '20 4 * * *'  # 11:20 AM Vietnam Time
-  workflow_dispatch:
+
 
 jobs:
   refresh_token:
